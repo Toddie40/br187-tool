@@ -2,28 +2,45 @@ import sys
 import numpy as np
 
 class Radiator:
-    def __init__(self, width, height, separation):
+    def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.separation = separation
 
-    def ViewFactor(self, type='p'):
-        X = self.width / self.separation
-        Y = self.height / self.separation
+    def ViewFactor(self, separation, type='p',):
+        X = self.width / separation
+        Y = self.height / separation
 
         if type == 'o': # orthogonal
             return 1 / (2 * np.pi) * (  np.arctan(X) - (1/np.sqrt(1+Y**2))*np.arctan(X/np.sqrt(1+Y**2))  )
         if type == 'c': # corner
             return 1 / (2 * np.pi) * (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1+X**2)  +  Y / np.sqrt(1+Y**2) * np.arctan(X/np.sqrt(1+Y**2)) )
         if type == 'p': # parallel
-            X = self.width / ( 2 * self.separation)
-            Y = self.height / ( 2 * self.separation)
+            X = self.width / ( 2 * separation)
+            Y = self.height / ( 2 * separation)
             return ( 2 / np.pi ) * ( (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1 + X**2))  +  ( Y / np.sqrt(1+Y**2) ) * np.arctan(X/np.sqrt(1+Y**2)) )
         else:
             print("Unrecognised type!")
             return False
 
+#TODO think of clevcer way to iteratively approach solution of this fiddly graph. it's so sensitive so im struglling to approach it closely and quickly
+def CalculateMinimumSafeDistance(radiator: Radiator, intensity, iterations, precision=0.1):
+    safeIntensity = 12.6
+    startingDistance = 0.1 #don't want divede by zero errors
+    increment = precision
 
+    finalIncedentRad = 0
+    distance = startingDistance
+    for i in range(0, iterations):
+        viewFactor = radiator.ViewFactor(distance)
+        incedentRad = intensity * viewFactor
+
+        if incedentRad > safeIntensity:
+            distance += increment
+            continue
+        else:
+            return np.round(distance, 1)
+    print("Unable to reach solution, consider increasing the number of iterations")
+    return np.round(distance,1)
 
 def main():
 
@@ -42,14 +59,14 @@ def main():
 
     type = args.type
     title = args.title
-    radiator = Radiator(args.width, args.height, args.separation)
-    viewFactor = radiator.ViewFactor(type=type)
+    radiator = Radiator(args.width, args.height)
+    viewFactor = radiator.ViewFactor(args.separation, type=type)
 
     print("BR 187 | Unprotected Area Calculator\nAuthor: A. Todd\nDate: 06/02/2020\nOFR Consultants\n")
     print("Performing assessment: "+title+"\nOf type: "+type)
-    print("geometry:\n width: {}\n height: {}\n separation: {}".format(args.width, args.height, args.separation))
-    print("View factor for radiator at this separation distance: "+str(viewFactor)+"\n")
-
+    print("geometry:\n width: {}m\n height: {}m\n separation: {}m".format(args.width, args.height, args.separation))
+    print("View factor for radiator at this separation distance: "+str(viewFactor))
+    print("-------------------------------------------------------------------------------\n")
 
     I_source = [84.6, 168] #low and high values for low and standard fire load
 
@@ -59,9 +76,10 @@ def main():
 
     for index, source in enumerate(I_source):
         print("For a source of "+str(I_source[index])+"kW/sqm")
-        print("Maximum unprotected area allowable is "+str(unprotectedArea[index])+"%")
+        print("Minimum safe distance for 100% unprotected area: {}m\n".format(CalculateMinimumSafeDistance(radiator, I_source[index], 1000)))
+        print("Maximum unprotected area allowable for separation of {}m: ".format(args.separation)+str(unprotectedArea[index])+"%")
         print("If the building is sprinklered, this can be increased to "+str(np.clip(unprotectedArea[index] * 2,0,100))+"%")
-        print("\n")
+        print("-------------------------------------------------------------------------------\n")
 
 if __name__ == "__main__":
     main()
