@@ -7,43 +7,130 @@ class Radiator:
         self.height = height
 
     def ViewFactor(self, separation, type='p',):
-        X = self.width / separation
-        Y = self.height / separation
+        if not separation == 0:
+            X = self.width / separation
+            Y = self.height / separation
 
         if type == 'o': # orthogonal
-            return 1 / (2 * np.pi) * (  np.arctan(X) - (1/np.sqrt(1+Y**2))*np.arctan(X/np.sqrt(1+Y**2))  )
+            return 1 / (2 * np.pi) * (  np.arctan(X) - (1/np.sqrt(1+Y**2))*np.arctan(X/np.sqrt(1+Y**2))  ) if not separation == 0 else 0.25
         if type == 'c': # corner
-            return 1 / (2 * np.pi) * (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1+X**2)  +  Y / np.sqrt(1+Y**2) * np.arctan(X/np.sqrt(1+Y**2)) )
+            return 1 / (2 * np.pi) * (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1+X**2)  +  Y / np.sqrt(1+Y**2) * np.arctan(X/np.sqrt(1+Y**2)) ) if not separation == 0 else 0.25
         if type == 'p': # parallel
             X = self.width / ( 2 * separation)
             Y = self.height / ( 2 * separation)
-            return ( 2 / np.pi ) * ( (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1 + X**2))  +  ( Y / np.sqrt(1+Y**2) ) * np.arctan(X/np.sqrt(1+Y**2)) )
+            return ( 2 / np.pi ) * ( (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1 + X**2))  +  ( Y / np.sqrt(1+Y**2) ) * np.arctan(X/np.sqrt(1+Y**2)) ) if not separation == 0 else 1
         else:
             print("Unrecognised type!")
             return False
 
-#TODO think of clevcer way to iteratively approach solution of this fiddly graph. it's so sensitive so im struglling to approach it closely and quickly
-def CalculateMinimumSafeDistance(radiator: Radiator, intensity, iterations, precision=0.1):
-    safeIntensity = 12.6
-    startingDistance = 0.1 #don't want divede by zero errors
-    increment = precision
 
-    finalIncedentRad = 0
-    distance = startingDistance
-    for i in range(0, iterations):
-        viewFactor = radiator.ViewFactor(distance)
-        incedentRad = intensity * viewFactor
+class Analysis:
 
-        if incedentRad > safeIntensity:
-            distance += increment
-            continue
-        else:
-            return np.round(distance, 1)
-    print("Unable to reach solution, consider increasing the number of iterations")
-    return np.round(distance,1)
+    # A nice dictionary to store the proper names of types
+    typeDict = {'o':'orthogonal',
+                'p':'parallel',
+                'c':'corner'}
+
+    def __init__(self, title, type, separation, radiator, iterations=10000, precision=0.01):
+        self.title = title
+        self.type = type
+        self.radiator = radiator
+        self.iterations = iterations
+        self.precision = precision
+        self.separation = separation
+        self.viewFactor = self.radiator.ViewFactor(self.separation, type=self.type)
+
+    #TODO think of clevcer way to iteratively approach solution of this fiddly graph. it's so sensitive so im struglling to approach it closely and quickly
+    def calculate_minimum_safe_distance(self, intensity, iterations, precision):
+        safeIntensity = 12.6
+        startingDistance = 0.1 #don't want divede by zero errors
+        increment = precision
+
+        finalIncedentRad = 0
+        distance = startingDistance
+        for i in range(0, iterations):
+            viewFactor = self.radiator.ViewFactor(distance)
+            incedentRad = intensity * viewFactor
+
+            if incedentRad > safeIntensity:
+                distance += increment
+                continue
+            else:
+                return np.round(distance, 1)
+        print("Unable to reach accurate solution, consider increasing the number of iterations")
+        return np.round(distance,1)
+
+    def calculate(self):
+        results = {
+                    'Title' : self.title,
+                    'Type': self.typeDict[self.type],
+                    'Radiator Dimensions' : {
+                        'Width': self.radiator.width,
+                        'Height': self.radiator.height
+                    },
+                    'Reduced Fire Load': {
+                        'Safe Distance': 0,
+                        'Unprotected Area': {
+                            'unsprinklered' : 0,
+                            'sprinklered' : 0
+                        }
+                    },
+                    'Standard Fire Load': {
+                        'Safe Distance': 0,
+                        'Unprotected Area': {
+                            'unsprinklered' : 0,
+                            'sprinklered' : 0
+                        }
+                    }
+        }
+        #reduced fire Load
+        I_received_reduced = 84 * self.viewFactor
+        results['Reduced Fire Load']['Safe Distance'] = self.calculate_minimum_safe_distance(84, self.iterations, self.precision)
+        results['Reduced Fire Load']['Unprotected Area']['unsprinklered'] = np.round(np.clip(12.6/I_received_reduced * 100,0,100),1)
+        results['Reduced Fire Load']['Unprotected Area']['sprinklered'] = np.round(np.clip(12.6/I_received_reduced * 100 * 2,0,100),1)
+
+        #standard fire load
+        I_received_standard = 168 * self.viewFactor
+        results['Standard Fire Load']['Safe Distance'] = self.calculate_minimum_safe_distance(168, self.iterations, self.precision)
+        results['Standard Fire Load']['Unprotected Area']['unsprinklered']= np.round(np.clip(12.6/I_received_standard * 100,0,100),1)
+        results['Standard Fire Load']['Unprotected Area']['sprinklered']= np.round(np.clip(12.6/I_received_standard * 100 * 2,0,100),1)
+
+        self.results = results
+
+        return results
+
+    def save_results(self, path='results.csv'):
+        import csv
+        with open (path, 'w') as file:
+            writer = csv.DictWriter(file, self.results.keys())
+            writer.writeheader()
+            writer.writerow(self.results)
+        return True
+
+    def pretty_print_dict(self,d):
+        for key, value in d.items():
+            if isinstance(value, dict):
+                print(key)
+                self.pretty_print_dict(value)
+            else:
+                print("\t{}: {}".format(key, value))
+        return True
+    def print_results(self):
+        self.pretty_print_dict(self.results)
+
 
 def main():
 
+    title_string = """
+--------------------------------------------------------------------------------------------------------
+BR 187 | External Fire Spread Calculator
+A calculator based on the BR 187 standard for calculating external fire spread to neighbouring buildings
+
+Author: Alex Todd
+OFR Consultants
+"""
+
+    print(title_string)
     #parsing arguments
     import argparse
     parser = argparse.ArgumentParser(   description="A program for calculating the required percent protected area of an external wall",
@@ -61,27 +148,19 @@ def main():
 
     type = args.type
     title = ' '.join(args.title) # convert the list into a string
-    radiator = Radiator(args.width, args.height)
-    viewFactor = radiator.ViewFactor(args.separation, type=type)
 
-    print("BR 187 | Unprotected Area Calculator\nAuthor: A. Todd\nDate: 06/02/2020\nOFR Consultants\n")
-    print("Performing assessment: "+title+"\nOf type: "+type)
-    print("geometry:\n width: {}m\n height: {}m\n separation: {}m".format(args.width, args.height, args.separation))
-    print("View factor for radiator at this separation distance: "+str(viewFactor))
-    print("-------------------------------------------------------------------------------\n")
+    analysis = Analysis(title, type, args.separation, Radiator(args.width, args.height))
 
-    I_source = [84.6, 168] #low and high values for low and standard fire load
-
-    I_received = np.array(I_source) * viewFactor
-
-    unprotectedArea = np.round(np.clip(12.6/I_received * 100,0,100),1)
-
+    results = analysis.calculate()
+    analysis.save_results()
+    analysis.print_results()
+'''
     for index, source in enumerate(I_source):
         print("For a source of "+str(I_source[index])+"kW/sqm")
         print("Minimum safe distance for 100% unprotected area: {}m\n".format(CalculateMinimumSafeDistance(radiator, I_source[index], 1000)))
         print("Maximum unprotected area allowable for separation of {}m: ".format(args.separation)+str(unprotectedArea[index])+"%")
         print("If the building is sprinklered, this can be increased to "+str(np.clip(unprotectedArea[index] * 2,0,100))+"%")
         print("-------------------------------------------------------------------------------\n")
-
+'''
 if __name__ == "__main__":
     main()
