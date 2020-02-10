@@ -131,6 +131,7 @@ BR 187 | External Fire Spread Calculator
 A calculator based on the BR 187 standard for calculating external fire spread to neighbouring buildings
 
 Author: Alex Todd
+Date: 10/02/2020
 OFR Consultants
 """
 
