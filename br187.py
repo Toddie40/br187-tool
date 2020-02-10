@@ -64,6 +64,8 @@ class Analysis:
         results = {
                     'Title' : self.title,
                     'Type': self.typeDict[self.type],
+                    'Separation': self.separation,
+                    'View Factor': self.viewFactor,
                     'Radiator Dimensions' : {
                         'Width': self.radiator.width,
                         'Height': self.radiator.height
@@ -99,21 +101,23 @@ class Analysis:
 
         return results
 
-    def save_results(self, path='results.csv'):
+    def save_results(self, path=None):
         import csv
+        if path == None:
+            path = str(self.title)+".csv"
         with open (path, 'w') as file:
             writer = csv.DictWriter(file, self.results.keys())
             writer.writeheader()
             writer.writerow(self.results)
         return True
 
-    def pretty_print_dict(self,d):
+    def pretty_print_dict(self,d,indent=0):
         for key, value in d.items():
             if isinstance(value, dict):
-                print(key)
-                self.pretty_print_dict(value)
+                print("\t" * indent + str(key))
+                self.pretty_print_dict(value,indent + 1)
             else:
-                print("\t{}: {}".format(key, value))
+                print(indent * "\t" + "{}: {}".format(key, value))
         return True
     def print_results(self):
         self.pretty_print_dict(self.results)
@@ -154,13 +158,6 @@ OFR Consultants
     results = analysis.calculate()
     analysis.save_results()
     analysis.print_results()
-'''
-    for index, source in enumerate(I_source):
-        print("For a source of "+str(I_source[index])+"kW/sqm")
-        print("Minimum safe distance for 100% unprotected area: {}m\n".format(CalculateMinimumSafeDistance(radiator, I_source[index], 1000)))
-        print("Maximum unprotected area allowable for separation of {}m: ".format(args.separation)+str(unprotectedArea[index])+"%")
-        print("If the building is sprinklered, this can be increased to "+str(np.clip(unprotectedArea[index] * 2,0,100))+"%")
-        print("-------------------------------------------------------------------------------\n")
-'''
+
 if __name__ == "__main__":
     main()
