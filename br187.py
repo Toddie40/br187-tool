@@ -145,20 +145,19 @@ OFR Consultants
     #parsing arguments
     import argparse
     parser = argparse.ArgumentParser(   description="A program for calculating the required percent protected area of an external wall",
-                                        epilog="If you need any help don't hesitate to ask\nAnd if you have any feature requests then feel free to send them my way!\n\tAlex.Todd@ofrconsultants.com",
-                                        usage="%(prog)s WIDTH HEIGHT SEPARATION [--type {'c','p','o'}] [--title TITLE]"
+                                        epilog="If you need any help don't hesitate to ask\nAnd if you have any feature requests then feel free to send them my way!\n\tAlex.Todd@ofrconsultants.com"
                                         )
     parser.add_argument('width', help="the width of the radiating rectangle in meters", type=float)
     parser.add_argument('height', help="the height of the radiating rectangle in meters", type=float)
     parser.add_argument('separation', help="the separation distance between the radiator and the receiving surface in meters. (If you are using boundary distances then this will be twice the boundary distance).",type=float)
     parser.add_argument('--type', help="the type of analysis to perform. 'o' orthogonal, 'c' corner, 'p' parallel. By default this is set as 'p'", choices=['c','o','p'], type=str, default='p')
-    parser.add_argument('--title', help="a title for the analysis", type=str, default="unnamed analysis", nargs='*')
+    parser.add_argument('--title', help="a title for the analysis", type=str, default="unnamed analysis")
     # REMEMBER TO UPDATE USAGE IF ADDING ARGUMENTS
     args = parser.parse_args()
     #done parsing args
 
     type = args.type
-    title = ' '.join(args.title) # convert the list into a string
+    title = args.title
 
     analysis = Analysis(title, type, args.separation, Radiator(args.width, args.height))
 
