@@ -105,12 +105,18 @@ class Analysis:
         import csv
         if path == None:
             path = str(self.title)+".csv"
-        with open (path, 'w') as file:
-            writer = csv.DictWriter(file, self.results.keys())
-            writer.writeheader()
-            writer.writerow(self.results)
+
+        try:
+            with open (path, 'w') as file:
+                writer = csv.DictWriter(file, self.results.keys())
+                writer.writeheader()
+                writer.writerow(self.results)
+        except IOError as e:
+            print("\nWARNING!\nUnable to save results -Can't open file for writing.\nPerhaps you don't have permission to write to this directory or a file with this name is already open?")
+            print("(Error code: {})".format(str(e)))
         return True
 
+    # a little recursive script for printing nested dictionaries in a nice way
     def pretty_print_dict(self,d,indent=0):
         for key, value in d.items():
             if isinstance(value, dict):
@@ -157,8 +163,8 @@ OFR Consultants
     analysis = Analysis(title, type, args.separation, Radiator(args.width, args.height))
 
     results = analysis.calculate()
-    analysis.save_results()
     analysis.print_results()
+    analysis.save_results()
 
 if __name__ == "__main__":
     main()
