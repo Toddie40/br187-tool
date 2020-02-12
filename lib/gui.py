@@ -1,5 +1,5 @@
 from tkinter import *
-
+from tkinter.ttk import *
 
 class Gui:
 
@@ -14,8 +14,19 @@ class Gui:
 
         #font
         fnt_title = 'Helvetica 18 bold'
+        fnt_h1 = 'Helvetica 16 bold underline'
+        fnt_h2 = 'Helvetica 14 bold'
         fnt_alt = 'Helvetica 12'
         fnt = 'Helvetica 10'
+
+
+        style = Style()
+        style.configure("TFrame", foreground=fg, background=bg, font=fnt_alt)
+        style.configure("TLabel", foreground=fg, background=bg, font=fnt, justify=LEFT)
+        style.configure("title.TLabel", foreground=white, background=ofr, font=fnt_title)
+        style.configure("heading.TLabel", foreground=fg, background=bg, font=fnt_h1)
+        style.configure("heading2.TLabel", foreground=fg, background=bg, font=fnt_h2)
+
 
         self.closed = False #this is a bad sign already isn't it...
         self.selected_type = StringVar()
@@ -28,23 +39,22 @@ class Gui:
         self.root = root
 
 
-
-        self.main_container = Frame(root, bg=white)
+        self.main_container = Frame(root)
         self.main_container.pack()
 
-        self.title_container = Frame(self.main_container)
+        self.title_container = Frame(self.main_container, style="title.TLabel")
         self.title_container.pack(side=TOP, expand=YES, fill=BOTH)
-        self.app_title = Label(self.title_container, text="BR187 External Fire Spread Tool", bg=ofr, fg=white, font=fnt_title, justify=CENTER)
-        self.app_title.pack(side=TOP, fill=BOTH, expand=YES)
+        self.app_title = Label(self.title_container, text="BR187 External Fire Spread Tool", style="title.TLabel", justify=CENTER)
+        self.app_title.pack()
 
 
-        self.io_container = Frame(self.main_container)
+        self.io_container = Frame(self.main_container, padding=10)
         self.io_container.pack(side=TOP)
 
-        self.input_container = Frame(self.io_container)
+        self.input_container = Frame(self.io_container, padding=10)
         self.input_container.pack(side=LEFT)
 
-        self.output_container = Frame(self.io_container, bg=bg)
+        self.output_container = Frame(self.io_container, padding=10)
         self.output_container.pack(side=RIGHT, fill=BOTH, expand=YES)
 
         self.entries = {}
@@ -137,48 +147,41 @@ class Gui:
         #output container
 
         #frames
-        self.results_title = Label(self.output_container, text="Results", font=fnt_alt, bg=bg).pack(side=TOP, expand=YES, fill=BOTH)
+        self.results_title = Label(self.output_container, text="Results", style="heading.TLabel").pack(side=TOP, expand=YES, fill=BOTH)
 
-        self.standard_load_results = Frame(self.output_container)
+        self.standard_load_results = Frame(self.output_container, padding=20)
         self.standard_load_results.pack(side=TOP)
-        self.standard_label = Label(self.standard_load_results, text="Standard Fire Load (168 kW/sqm)", fg=fg, bg=bg, font=fnt_alt).pack()
+        self.standard_label = Label(self.standard_load_results, text="Standard Fire Load (168 kW/sqm)", style="heading2.TLabel").pack()
         self.reduced_load_results = Frame(self.output_container)
         self.reduced_load_results.pack(side=TOP)
-        self.reduced_label = Label(self.reduced_load_results, text="Reduced Fire Load (84 kW/sqm)", fg=fg, bg=bg, font=fnt_alt).pack()
+        self.reduced_label = Label(self.reduced_load_results, text="Reduced Fire Load (84 kW/sqm)", style="heading2.TLabel").pack()
+
+        self.reduced_distance_frame = Frame(self.reduced_load_results)
+        self.reduced_distance_frame.pack(side=TOP)
+        self.reduced_sprinklered = Frame(self.reduced_load_results)
+        self.reduced_sprinklered.pack(side=TOP)
+        self.reduced_unsprinklered = Frame(self.reduced_load_results)
+        self.reduced_unsprinklered.pack(side=TOP)
 
 
-        self.reduced_safe_distance_frame = Frame(self.reduced_load_results)
-        self.reduced_safe_distance_frame.pack(side=TOP)
-
-        self.reduced_protected_area_frame = Frame(self.reduced_load_results)
-        self.reduced_protected_area_frame.pack(side=TOP)
-
-        self.standard_safe_distance_frame = Frame(self.standard_load_results)
-        self.standard_safe_distance_frame.pack(side=TOP)
-
-        self.standard_protected_area_frame = Frame(self.standard_load_results)
-        self.standard_protected_area_frame.pack(side=TOP)
-
-        #widgets
-
-        self.outputs = {}
-
-        self.reduced_safe_distance_label = Label(self.reduced_safe_distance_frame, text="Minimum Safe Distance: ").pack(side=LEFT)
-        self.outputs['reduced_safe_distance'] = self.reduced_safe_distance_label
-
-        self.reduced_protected_area_label = Label(self.reduced_protected_area_frame, text="Minimum Unprotected Area:").pack(side=LEFT)
-        self.reduced_protected_area_result_frame = Frame(self.reduced_protected_area_frame)
-        self.reduced_protected_area_result_frame.pack(side=RIGHT, expand=YES, fill=BOTH)
-        self.reduced_protected_area_frame
+        self.reduced_distance_label = Label(self.reduced_distance_frame, text="Minimum Safe Distance").pack(side=LEFT)
+        self.reduced_unsprinklered_label = Label(self.reduced_unsprinklered, text="Maximum Nonsprinklered Unprotected Area").pack(side=LEFT)
+        self.reduced_sprinklered_label = Label(self.reduced_sprinklered, text="Maximum Sprinklered Unprotected Area").pack(side=LEFT)
+        self.reduced_distance_result = Label(self.reduced_distance_frame, text="0").pack(side=RIGHT)
+        self.reduced_sprinklered_result = Label(self.reduced_sprinklered, text="0").pack(side=RIGHT)
+        self.reduced_unsprinklered_result = Label(self.reduced_unsprinklered, text="0").pack(side=RIGHT)
 
 
-        self.standard_safe_distance_label = Label(self.standard_safe_distance_frame, text="Minimum Safe Distance: ").pack(side=LEFT)
-        self.standard_protected_area_label = Label(self.standard_protected_area_frame, text="Minimum Unprotected Area:").pack(side=LEFT)
-        self.standard_protected_area_result_frame = Frame(self.standard_protected_area_frame)
-        self.standard_protected_area_result_frame.pack(side=RIGHT, expand=YES, fill=BOTH)
-        self.standard_protected_area_nonsprinklered = Label(self.standard_protected_area_result_frame, text="Non-Sprinklered:").pack(side=TOP)
-        self.standard_protected_area_sprinklered = Label(self.standard_protected_area_result_frame, text="Sprinklered:").pack(side=TOP)
+        self.standard_distance_frame = Frame(self.standard_load_results)
+        self.standard_distance_frame.pack(side=TOP)
+        self.standard_sprinklered = Frame(self.standard_load_results)
+        self.standard_sprinklered.pack(side=TOP)
+        self.standard_unsprinklered = Frame(self.standard_load_results)
+        self.standard_unsprinklered.pack(side=TOP)
 
+        self.standard_distance_label = Label(self.standard_distance_frame, text="Minimum Safe Distance").pack(side=LEFT)
+        self.standard_unsprinklered_label = Label(self.standard_unsprinklered, text="Maximum Nonsprinklered Unprotected Area").pack(side=LEFT)
+        self.standard_sprinklered_label = Label(self.standard_sprinklered, text="Maximum Sprinklered Unprotected Area").pack(side=LEFT)
 
 
     def calculate(self):
