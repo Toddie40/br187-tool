@@ -1,5 +1,7 @@
 import sys
 import numpy as np
+from lib import gui
+
 
 class Radiator:
     def __init__(self, width, height):
@@ -101,11 +103,9 @@ class Analysis:
 
         return results
 
-    def save_results(self, path=None):
+    def save_results(self, p):
         import csv
-        if path == None:
-            path = str(self.title)+".csv"
-
+        path = p + ".csv"
         try:
             with open (path, 'w') as file:
                 writer = csv.DictWriter(file, self.results.keys())
@@ -127,6 +127,7 @@ class Analysis:
         return True
     def print_results(self):
         self.pretty_print_dict(self.results)
+
 
 
 def main():
@@ -152,6 +153,8 @@ OFR Consultants
     parser.add_argument('separation', help="the separation distance between the radiator and the receiving surface in meters. (If you are using boundary distances then this will be twice the boundary distance).",type=float)
     parser.add_argument('--type', help="the type of analysis to perform. 'o' orthogonal, 'c' corner, 'p' parallel. By default this is set as 'p'", choices=['c','o','p'], type=str, default='p')
     parser.add_argument('--title', help="a title for the analysis", type=str, default="unnamed analysis")
+    parser.add_argument('-i', '--interactive', help="Launch in interactive mode with graphical interface", action='store_true')
+    parser.add_argument('-o', '--output', help="Name of output file if output", type=str, default=None)
     # REMEMBER TO UPDATE USAGE IF ADDING ARGUMENTS
     args = parser.parse_args()
     #done parsing args
@@ -159,11 +162,45 @@ OFR Consultants
     type = args.type
     title = args.title
 
-    analysis = Analysis(title, type, args.separation, Radiator(args.width, args.height))
 
-    results = analysis.calculate()
-    analysis.print_results()
-    analysis.save_results()
+    if args.interactive:
+        UI = gui.init()
+        UI.entries['width'].insert(0,args.width)
+        UI.entries['height'].insert(0,args.height)
+        UI.entries['separation'].insert(0,args.separation)
+        UI.entries['title'].insert(0,args.title)
+        UI.entries['type'].set(args.type) #this will need to be changed to radio buttons
+
+        while not UI.closed: #main application loop goes here
+            UI.update()
+            if UI.calculateThisLoop:
+                title = UI.entries['title'].get()
+                type = UI.entries['type'].get()
+                width = float(UI.entries['width'].get())
+                height = float(UI.entries['height'].get())
+                separation = float(UI.entries['separation'].get())
+
+                analysis = Analysis(title, type, separation, Radiator(width, height))
+                results = analysis.calculate()
+                analysis.print_results()
+
+                UI.calculateThisLoop = False
+
+
+    #TODO setup event listening in this script for when the gui update button is pressed
+    #     in order to run an analysis
+    #   For now just run without interactive filemode
+    else:
+        analysis = Analysis(title, type, args.separation, Radiator(args.width, args.height))
+
+        results = analysis.calculate()
+        analysis.print_results()
+
+        if args.output != None:
+            analysis.save_results(args.output)
+
+
+
 
 if __name__ == "__main__":
     main()
