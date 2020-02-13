@@ -88,11 +88,30 @@ class Gui:
             self.containers[i] = Frame(self.input_container, padding=10)
             self.containers[i].pack(side=TOP, fill=BOTH, expand=YES)
 
+        #Analysis title selection
+        self.title_label = Label(self.containers[0], text="Title")
+        self.title_label.pack(side=LEFT)
 
-        self.radiator_label = Label(self.containers[0], text="Radiator Geometry")
+        self.title_entry = Entry(self.containers[0])
+        self.title_entry.pack(side=RIGHT)
+        self.entries['title'] = self.title_entry
+
+        # Type Selection
+        self.type_label = Label(self.containers[1], text="Type")
+        self.type_label.pack(side=LEFT)
+
+        self.type_entry = Frame(self.containers[1])
+        self.type_entry.pack(side=RIGHT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Parallel", value='p', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Perpendicular", value='o', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Corner", value='c', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
+        self.entries['type'] = self.selected_type
+
+
+        self.radiator_label = Label(self.containers[2], text="Radiator Geometry")
         self.radiator_label.pack(side=LEFT)
 
-        self.radiatior_geometry_frame = Frame(self.containers[0])
+        self.radiatior_geometry_frame = Frame(self.containers[2])
         self.radiatior_geometry_frame.pack(side=LEFT, expand=YES, fill=BOTH)
 
         self.radiatior_geometry_height_frame = Frame(self.radiatior_geometry_frame)
@@ -117,32 +136,15 @@ class Gui:
         self.entries['height'] = self.radiator_height_entry
 
 
-        self.separation_label = Label(self.containers[1], text="Separation (TWICE THE BOUNDARY DISTANCE)")
+        self.separation_label = Label(self.containers[3], text="Separation (TWICE THE BOUNDARY DISTANCE)")
         self.separation_label.pack(side=LEFT)
 
-        self.separation_entry = Entry(self.containers[1])
+        self.separation_entry = Entry(self.containers[3])
         self.separation_entry.pack(side=RIGHT)
         self.entries['separation'] = self.separation_entry
 
 
-        # Type Selection
-        self.type_label = Label(self.containers[2], text="Type")
-        self.type_label.pack(side=LEFT)
 
-        self.type_entry = Frame(self.containers[2])
-        self.type_entry.pack(side=RIGHT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Parallel", value='p', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Perpendicular", value='o', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Corner", value='c', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
-        self.entries['type'] = self.selected_type
-
-        #Analysis title selection
-        self.title_label = Label(self.containers[3], text="Title")
-        self.title_label.pack(side=LEFT)
-
-        self.title_entry = Entry(self.containers[3])
-        self.title_entry.pack(side=RIGHT)
-        self.entries['title'] = self.title_entry
 
         calculate_button = Button(self.input_container, text="Calculate", command=self.calculate)
         calculate_button.pack()
@@ -230,7 +232,9 @@ class Gui:
             # do nothing, the app is closed
 
 
-def init():
+def init(title, icon):
     root = Tk()
+    root.wm_title(title)
+    root.iconbitmap(icon)
     gui = Gui(root)
     return gui

@@ -1,6 +1,13 @@
-import sys
+import sys, os
 import numpy as np
 from lib import gui
+
+
+global app_title
+global app_icon
+
+app_title = "BR187 Calculator"
+app_icon = os.path.join("icon.ico")
 
 
 class Radiator:
@@ -145,12 +152,12 @@ OFR Consultants
     parser = argparse.ArgumentParser(   description="A program for calculating the required percent protected area of an external wall",
                                         epilog="If you need any help don't hesitate to ask\nAnd if you have any feature requests then feel free to send them my way!\n\tAlex.Todd@ofrconsultants.com"
                                         )
-    parser.add_argument('width', help="the width of the radiating rectangle in meters", type=float)
-    parser.add_argument('height', help="the height of the radiating rectangle in meters", type=float)
-    parser.add_argument('separation', help="the separation distance between the radiator and the receiving surface in meters. (If you are using boundary distances then this will be twice the boundary distance).",type=float)
+    parser.add_argument('-c', '--commandline', help="Run analysis from commandline. Use with --width, --height and --separation options to define analysis", action='store_true')
+    parser.add_argument('--width', help="the width of the radiating rectangle in meters", type=float, default="0")
+    parser.add_argument('--height', help="the height of the radiating rectangle in meters", type=float, default="0")
+    parser.add_argument('--separation', help="the separation distance between the radiator and the receiving surface in meters. (If you are using boundary distances then this will be twice the boundary distance).",type=float, default="0")
     parser.add_argument('--type', help="the type of analysis to perform. 'o' orthogonal, 'c' corner, 'p' parallel. By default this is set as 'p'", choices=['c','o','p'], type=str, default='p')
     parser.add_argument('--title', help="a title for the analysis", type=str, default="unnamed analysis")
-    parser.add_argument('-i', '--interactive', help="Launch in interactive mode with graphical interface", action='store_true')
     parser.add_argument('-o', '--output', help="Name of output file if output", type=str, default=None)
     # REMEMBER TO UPDATE USAGE IF ADDING ARGUMENTS
     args = parser.parse_args()
@@ -172,8 +179,11 @@ OFR Consultants
         analysis.print_results()
         return analysis
 
-    if args.interactive:
-        UI = gui.init()
+    if not args.commandline:
+        import pathlib
+        working_dir = pathlib.Path(__file__).parent.absolute()
+
+        UI = gui.init(app_title, working_dir / app_icon)
         UI.entries['width'].insert(0,args.width)
         UI.entries['height'].insert(0,args.height)
         UI.entries['separation'].insert(0,args.separation)
