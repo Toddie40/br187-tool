@@ -93,12 +93,14 @@ class Gui:
         self.radiator_label.pack(side=LEFT)
 
         self.radiatior_geometry_frame = Frame(self.containers[0])
-        self.radiatior_geometry_frame.pack(side=LEFT)
-        self.radiatior_geometry_width_frame = Frame(self.radiatior_geometry_frame)
-        self.radiatior_geometry_width_frame.pack(side=LEFT)
+        self.radiatior_geometry_frame.pack(side=LEFT, expand=YES, fill=BOTH)
 
         self.radiatior_geometry_height_frame = Frame(self.radiatior_geometry_frame)
-        self.radiatior_geometry_height_frame.pack(side=LEFT)
+        self.radiatior_geometry_height_frame.pack(side=RIGHT)
+
+        self.radiatior_geometry_width_frame = Frame(self.radiatior_geometry_frame, padding=10)
+        self.radiatior_geometry_width_frame.pack(side=RIGHT)
+
 
 
         self.radiator_width_label = Label(self.radiatior_geometry_width_frame, text="Width")
@@ -115,7 +117,7 @@ class Gui:
         self.entries['height'] = self.radiator_height_entry
 
 
-        self.separation_label = Label(self.containers[1], text="Separation")
+        self.separation_label = Label(self.containers[1], text="Separation (TWICE THE BOUNDARY DISTANCE)")
         self.separation_label.pack(side=LEFT)
 
         self.separation_entry = Entry(self.containers[1])
