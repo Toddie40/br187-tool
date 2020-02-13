@@ -18,8 +18,9 @@ class Radiator:
         if type == 'c': # corner
             return 1 / (2 * np.pi) * (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1+X**2)  +  Y / np.sqrt(1+Y**2) * np.arctan(X/np.sqrt(1+Y**2)) ) if not separation == 0 else 0.25
         if type == 'p': # parallel
-            X = self.width / ( 2 * separation)
-            Y = self.height / ( 2 * separation)
+            if not separation == 0:
+                X = self.width / ( 2 * separation)
+                Y = self.height / ( 2 * separation)
             return ( 2 / np.pi ) * ( (X / np.sqrt(1 + X**2)) * np.arctan(Y / np.sqrt(1 + X**2))  +  ( Y / np.sqrt(1+Y**2) ) * np.arctan(X/np.sqrt(1+Y**2)) ) if not separation == 0 else 1
         else:
             print("Unrecognised type!")
