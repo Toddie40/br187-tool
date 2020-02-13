@@ -26,7 +26,7 @@ class Gui:
         style.configure("title.TLabel", foreground=white, background=ofr, font=fnt_title)
         style.configure("heading.TLabel", foreground=fg, background=bg, font=fnt_h1)
         style.configure("heading2.TLabel", foreground=fg, background=bg, font=fnt_h2)
-
+        style.configure("TRadiobutton", foreground=fg, background=bg)
 
         self.closed = False #this is a bad sign already isn't it...
         self.selected_type = StringVar()
@@ -83,7 +83,7 @@ class Gui:
 
 
         for i in range(0,len(self.containers)):
-            self.containers[i] = Frame(self.input_container)
+            self.containers[i] = Frame(self.input_container, padding=10)
             self.containers[i].pack(side=TOP, fill=BOTH, expand=YES)
 
 
@@ -127,9 +127,9 @@ class Gui:
 
         self.type_entry = Frame(self.containers[2])
         self.type_entry.pack(side=RIGHT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Parallel", value='p', variable=self.selected_type).pack(side=LEFT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Perpendicular", value='o', variable=self.selected_type).pack(side=LEFT)
-        self.type_rad_p = Radiobutton(self.type_entry, text="Corner", value='c', variable=self.selected_type).pack(side=LEFT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Parallel", value='p', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Perpendicular", value='o', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
+        self.type_rad_p = Radiobutton(self.type_entry, text="Corner", value='c', variable=self.selected_type, style="TRadiobutton").pack(side=LEFT)
         self.entries['type'] = self.selected_type
 
         #Analysis title selection
@@ -150,46 +150,64 @@ class Gui:
         self.results_title = Label(self.output_container, text="Results", style="heading.TLabel").pack(side=TOP, expand=YES, fill=BOTH)
 
         self.standard_load_results = Frame(self.output_container, padding=20)
-        self.standard_load_results.pack(side=TOP)
+        self.standard_load_results.pack(side=TOP, expand=YES, fill=BOTH)
         self.standard_label = Label(self.standard_load_results, text="Standard Fire Load (168 kW/sqm)", style="heading2.TLabel").pack()
-        self.reduced_load_results = Frame(self.output_container)
-        self.reduced_load_results.pack(side=TOP)
+        self.reduced_load_results = Frame(self.output_container, padding=20)
+        self.reduced_load_results.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_label = Label(self.reduced_load_results, text="Reduced Fire Load (84 kW/sqm)", style="heading2.TLabel").pack()
 
         self.reduced_distance_frame = Frame(self.reduced_load_results)
-        self.reduced_distance_frame.pack(side=TOP)
+        self.reduced_distance_frame.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_sprinklered = Frame(self.reduced_load_results)
-        self.reduced_sprinklered.pack(side=TOP)
+        self.reduced_sprinklered.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_unsprinklered = Frame(self.reduced_load_results)
-        self.reduced_unsprinklered.pack(side=TOP)
+        self.reduced_unsprinklered.pack(side=TOP, expand=YES, fill=BOTH)
 
 
         self.reduced_distance_label = Label(self.reduced_distance_frame, text="Minimum Safe Distance").pack(side=LEFT)
         self.reduced_unsprinklered_label = Label(self.reduced_unsprinklered, text="Maximum Nonsprinklered Unprotected Area").pack(side=LEFT)
         self.reduced_sprinklered_label = Label(self.reduced_sprinklered, text="Maximum Sprinklered Unprotected Area").pack(side=LEFT)
-        self.reduced_distance_result = Label(self.reduced_distance_frame, text="0").pack(side=RIGHT)
-        self.reduced_sprinklered_result = Label(self.reduced_sprinklered, text="0").pack(side=RIGHT)
-        self.reduced_unsprinklered_result = Label(self.reduced_unsprinklered, text="0").pack(side=RIGHT)
 
+        self.reduced_distance_result = Label(self.reduced_distance_frame, text="0")
+        self.reduced_distance_result.pack(side=RIGHT)
+        self.reduced_sprinklered_result = Label(self.reduced_sprinklered, text="0")
+        self.reduced_sprinklered_result.pack(side=RIGHT)
+        self.reduced_unsprinklered_result = Label(self.reduced_unsprinklered, text="0")
+        self.reduced_unsprinklered_result.pack(side=RIGHT)
 
         self.standard_distance_frame = Frame(self.standard_load_results)
-        self.standard_distance_frame.pack(side=TOP)
+        self.standard_distance_frame.pack(side=TOP, expand=YES, fill=BOTH)
         self.standard_sprinklered = Frame(self.standard_load_results)
-        self.standard_sprinklered.pack(side=TOP)
+        self.standard_sprinklered.pack(side=TOP, expand=YES, fill=BOTH)
         self.standard_unsprinklered = Frame(self.standard_load_results)
-        self.standard_unsprinklered.pack(side=TOP)
+        self.standard_unsprinklered.pack(side=TOP, expand=YES, fill=BOTH)
 
         self.standard_distance_label = Label(self.standard_distance_frame, text="Minimum Safe Distance").pack(side=LEFT)
         self.standard_unsprinklered_label = Label(self.standard_unsprinklered, text="Maximum Nonsprinklered Unprotected Area").pack(side=LEFT)
         self.standard_sprinklered_label = Label(self.standard_sprinklered, text="Maximum Sprinklered Unprotected Area").pack(side=LEFT)
 
+        self.standard_distance_result = Label(self.standard_distance_frame, text="0")
+        self.standard_distance_result.pack(side=RIGHT)
+        self.standard_sprinklered_result = Label(self.standard_sprinklered, text="0")
+        self.standard_sprinklered_result.pack(side=RIGHT)
+        self.standard_unsprinklered_result = Label(self.standard_unsprinklered, text="0")
+        self.standard_unsprinklered_result.pack(side=RIGHT)
 
     def calculate(self):
         self.calculateThisLoop = True
 
 
-    def set_output_field(self, field, new_value):
-        self.outputs[field]['text'] = new_value
+    def populate_results(self, results):
+        #distances
+        self.standard_distance_result.configure(text=str(results['Standard Fire Load']['Safe Distance']) + "m")
+        self.reduced_distance_result.configure(text=str(results['Reduced Fire Load']['Safe Distance']) + "m")
+
+        #protected areas
+        self.standard_sprinklered_result.configure(text=str(results['Standard Fire Load']['Unprotected Area']['sprinklered']) + "%")
+        self.standard_unsprinklered_result.configure(text=str(results['Standard Fire Load']['Unprotected Area']['unsprinklered']) + "%")
+
+        self.reduced_sprinklered_result.configure(text=str(results['Reduced Fire Load']['Unprotected Area']['sprinklered']) + "%")
+        self.reduced_unsprinklered_result.configure(text=str(results['Reduced Fire Load']['Unprotected Area']['unsprinklered']) + "%")
 
     def update(self):
         try:

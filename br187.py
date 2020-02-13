@@ -100,7 +100,6 @@ class Analysis:
         results['Standard Fire Load']['Unprotected Area']['sprinklered']= np.round(np.clip(12.6/I_received_standard * 100 * 2,0,100),1)
 
         self.results = results
-
         return results
 
     def save_results(self, p):
@@ -182,6 +181,7 @@ OFR Consultants
 
                 analysis = Analysis(title, type, separation, Radiator(width, height))
                 results = analysis.calculate()
+                UI.populate_results(results)
                 analysis.print_results()
 
                 UI.calculateThisLoop = False
