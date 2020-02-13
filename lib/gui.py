@@ -236,5 +236,6 @@ def init(title, icon):
     root = Tk()
     root.wm_title(title)
     root.iconbitmap(icon)
+    root.resizable(False, False) #non-resizable window for now
     gui = Gui(root)
     return gui
