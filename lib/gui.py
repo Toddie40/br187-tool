@@ -27,7 +27,7 @@ class Gui:
         style.configure("title.TLabel", foreground=white, background=ofr, font=fnt_title)
         style.configure("heading.TLabel", foreground=fg, background=bg, font=fnt_h1)
         style.configure("heading2.TLabel", foreground=fg, background=bg, font=fnt_h2)
-        style.configure("TRadiobutton", foreground=fg, background=bg)
+        style.configure("TRadiobutton", foreground=fg, background=bg, selectcolor=ofr)
 
         self.closed = False #this is a bad sign already isn't it...
         self.selected_type = StringVar()
@@ -49,9 +49,11 @@ class Gui:
         self.app_title = Label(self.title_container, text="BR187 External Fire Spread Tool", style="title.TLabel", justify=CENTER)
         self.app_title.pack()
 
-
         self.io_container = Frame(self.main_container, padding=10)
         self.io_container.pack(side=TOP)
+
+        self.footer_container = Frame(self.main_container, style="title.TLabel", padding=(5,5))
+        self.footer_container.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         self.input_container = Frame(self.io_container, padding=10)
         self.input_container.pack(side=LEFT)
@@ -93,7 +95,7 @@ class Gui:
         self.title_label.pack(side=LEFT)
 
         self.title_entry = Entry(self.containers[0])
-        self.title_entry.pack(side=RIGHT)
+        self.title_entry.pack(side=RIGHT, expand=YES, fill=BOTH, padx=(20,0))
         self.entries['title'] = self.title_entry
 
         # Type Selection
@@ -122,21 +124,21 @@ class Gui:
 
 
 
-        self.radiator_width_label = Label(self.radiatior_geometry_width_frame, text="Width")
+        self.radiator_width_label = Label(self.radiatior_geometry_width_frame, text="Width [m]")
         self.radiator_width_label.pack(side=TOP)
         self.radiator_width_entry = Entry(self.radiatior_geometry_width_frame)
         self.radiator_width_entry.pack(side=TOP)
         self.entries['width'] = self.radiator_width_entry
 
 
-        self.radiator_height_label = Label(self.radiatior_geometry_height_frame, text="Height")
+        self.radiator_height_label = Label(self.radiatior_geometry_height_frame, text="Height [m]")
         self.radiator_height_label.pack(side=TOP)
         self.radiator_height_entry = Entry(self.radiatior_geometry_height_frame)
         self.radiator_height_entry.pack(side=TOP)
         self.entries['height'] = self.radiator_height_entry
 
 
-        self.separation_label = Label(self.containers[3], text="Separation (TWICE THE BOUNDARY DISTANCE)")
+        self.separation_label = Label(self.containers[3], text="Separation [m]\n(usually twice the boundary distance)")
         self.separation_label.pack(side=LEFT)
 
         self.separation_entry = Entry(self.containers[3])
@@ -146,8 +148,8 @@ class Gui:
 
 
 
-        calculate_button = Button(self.input_container, text="Calculate", command=self.calculate)
-        calculate_button.pack()
+        calculate_button = Button(self.footer_container, text="Calculate", command=self.calculate)
+        calculate_button.pack(side=RIGHT)
 
 
         #output container
@@ -162,8 +164,8 @@ class Gui:
         self.reduced_load_results.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_label = Label(self.reduced_load_results, text="Reduced Fire Load (84 kW/sqm)", style="heading2.TLabel").pack()
 
-        self.save_button = Button(self.output_container, text="Save Results", command=self.save_results)
-        self.save_button.pack(side=TOP)
+        self.save_button = Button(self.footer_container, text="Save Results", command=self.save_results)
+        self.save_button.pack(side=RIGHT, padx=10)
 
 
         self.reduced_distance_frame = Frame(self.reduced_load_results)
