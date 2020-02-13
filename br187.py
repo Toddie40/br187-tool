@@ -7,8 +7,7 @@ global app_title
 global app_icon
 
 app_title = "BR187 Calculator"
-app_icon = os.path.join("icon.ico")
-
+app_icon = ".//icon.ico"
 
 class Radiator:
     def __init__(self, width, height):
@@ -180,10 +179,8 @@ OFR Consultants
         return analysis
 
     if not args.commandline:
-        import pathlib
-        working_dir = pathlib.Path(__file__).parent.absolute()
 
-        UI = gui.init(app_title, working_dir / app_icon)
+        UI = gui.init(app_title, app_icon)
         UI.entries['width'].insert(0,args.width)
         UI.entries['height'].insert(0,args.height)
         UI.entries['separation'].insert(0,args.separation)

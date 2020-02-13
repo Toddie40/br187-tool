@@ -237,7 +237,10 @@ class Gui:
 def init(title, icon):
     root = Tk()
     root.wm_title(title)
-    root.iconbitmap(icon)
+    try:
+        root.iconbitmap(icon)
+    except:
+        print("Unable to locate program icon")
     root.resizable(False, False) #non-resizable window for now
     gui = Gui(root)
     return gui
