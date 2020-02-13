@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import filedialog
 from tkinter.ttk import *
 
 class Gui:
@@ -33,6 +34,7 @@ class Gui:
 
         #event stuff YES I KNOW THIS IS JANKY
         self.calculateThisLoop = False
+        self.save = False
 
 
         #GUI layout
@@ -156,6 +158,10 @@ class Gui:
         self.reduced_load_results.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_label = Label(self.reduced_load_results, text="Reduced Fire Load (84 kW/sqm)", style="heading2.TLabel").pack()
 
+        self.save_button = Button(self.output_container, text="Save Results", command=self.save_results)
+        self.save_button.pack(side=TOP)
+
+
         self.reduced_distance_frame = Frame(self.reduced_load_results)
         self.reduced_distance_frame.pack(side=TOP, expand=YES, fill=BOTH)
         self.reduced_sprinklered = Frame(self.reduced_load_results)
@@ -196,6 +202,9 @@ class Gui:
     def calculate(self):
         self.calculateThisLoop = True
 
+    def save_results(self):
+        self.save_file = filedialog.asksaveasfile(mode="w")
+        self.save = True
 
     def populate_results(self, results):
         #distances

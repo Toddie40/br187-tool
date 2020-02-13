@@ -102,17 +102,14 @@ class Analysis:
         self.results = results
         return results
 
-    def save_results(self, p):
+    def save_results(self, f):
         import csv
-        path = p + ".csv"
-        try:
-            with open (path, 'w') as file:
-                writer = csv.DictWriter(file, self.results.keys())
-                writer.writeheader()
-                writer.writerow(self.results)
-        except IOError as e:
-            print("\nWARNING!\nUnable to save results -Can't open file for writing.\nPerhaps you don't have permission to write to this directory or a file with this name is already open?")
-            print("(Error code: {})".format(str(e)))
+
+        with f as file:
+            writer = csv.DictWriter(file, self.results.keys())
+            writer.writeheader()
+            writer.writerow(self.results)
+
         return True
 
     # a little recursive script for printing nested dictionaries in a nice way
@@ -161,6 +158,18 @@ OFR Consultants
     type = args.type
     title = args.title
 
+    def do_analysis():
+        title = UI.entries['title'].get()
+        type = UI.entries['type'].get()
+        width = float(UI.entries['width'].get())
+        height = float(UI.entries['height'].get())
+        separation = float(UI.entries['separation'].get())
+
+        analysis = Analysis(title, type, separation, Radiator(width, height))
+        results = analysis.calculate()
+        UI.populate_results(results)
+        analysis.print_results()
+        return analysis
 
     if args.interactive:
         UI = gui.init()
@@ -170,21 +179,21 @@ OFR Consultants
         UI.entries['title'].insert(0,args.title)
         UI.entries['type'].set(args.type) #this will need to be changed to radio buttons
 
+        analysis = do_analysis()
+
         while not UI.closed: #main application loop goes here
             UI.update()
             if UI.calculateThisLoop:
-                title = UI.entries['title'].get()
-                type = UI.entries['type'].get()
-                width = float(UI.entries['width'].get())
-                height = float(UI.entries['height'].get())
-                separation = float(UI.entries['separation'].get())
-
-                analysis = Analysis(title, type, separation, Radiator(width, height))
-                results = analysis.calculate()
-                UI.populate_results(results)
-                analysis.print_results()
-
+                analysis = do_analysis()
                 UI.calculateThisLoop = False
+            if UI.save:
+                analysis = do_analysis()
+                if UI.save_file != None:
+                    analysis.save_results(UI.save_file)
+                else:
+                    print("Canceled file dialog\nAnalysis not saved")
+                UI.save = False
+
 
 
     #TODO setup event listening in this script for when the gui update button is pressed
@@ -197,7 +206,13 @@ OFR Consultants
         analysis.print_results()
 
         if args.output != None:
-            analysis.save_results(args.output)
+            path = args.output + ".csv"
+            try:
+                f = open(path, 'w')
+                analysis.save_results(f)
+            except IOError as e:
+                print("\nWARNING!\nUnable to save results -Can't open file for writing.\nPerhaps you don't have permission to write to this directory or a file with this name is already open?")
+                print("(Error code: {})".format(str(e)))
 
 
 
