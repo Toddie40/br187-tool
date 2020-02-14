@@ -10,7 +10,9 @@ or for command line usage add the `-c` flag and provide the geometry:
 
 (Types are: **p**arallel, **c**orner, **o**rthogonal)
 
-Example: calculating external fire spread characteristics of a 10m x 3m wall a distance of 4m away from an opposite building:
+### Example:
+
+calculating external fire spread characteristics of a 10m x 3m wall a distance of 4m away from an opposite building:
 
 `br187.py -c --width 10 --height 3 --separation 4 --type p --title "example analysis" --output "my_analysis"`
 
