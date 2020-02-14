@@ -110,12 +110,10 @@ class Analysis:
         return results
 
     def save_results(self, f):
-        import csv
+        import json
 
         with f as file:
-            writer = csv.DictWriter(file, self.results.keys())
-            writer.writeheader()
-            writer.writerow(self.results)
+            json.dump(self.results, file, indent=1)
 
         return True
 
@@ -214,7 +212,7 @@ OFR Consultants
         analysis.print_results()
 
         if args.output != None:
-            path = args.output + ".csv"
+            path = args.output + ".json"
             try:
                 f = open(path, 'w')
                 analysis.save_results(f)

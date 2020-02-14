@@ -209,7 +209,7 @@ class Gui:
         self.calculateThisLoop = True
 
     def save_results(self):
-        self.save_file = filedialog.asksaveasfile(mode="w")
+        self.save_file = filedialog.asksaveasfile(mode="w", defaultextension=".json'", filetypes=[('json files', '.json'), ('text files', '.txt')])
         self.save = True
 
     def populate_results(self, results):
