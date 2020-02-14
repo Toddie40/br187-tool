@@ -2,13 +2,16 @@
 Tool for calculating the external fire spread of a radiating surface in line with guidance document BR 187
 
 ## Usage:
-`br187.py WIDTH HEIGHT SEPARATION [--type TYPE] [--title "TITLE"]`
+`br187.py`
+
+or for command line usage add the `-c` flag and provide the geometry:
+`br187.py -c [--width WIDTH] [--height HEIGHT] [--separation SEPARATION] [--type TYPE] [--title "TITLE"] [--output OUTPUTPATH]`
 
 (Types are: **p**arallel, **c**orner, **o**rthogonal)
 
 Example: calculating external fire spread characteristics of a 10m x 3m wall a distance of 4m away from an opposite building:
 
-`br187.py 10 3 4 --type p --title "example analysis"`
+`br187.py -c --width 10 --height 3 --separation 4 --type p --title "example analysis" --output "my_analysis"`
 
 Output:
 ```

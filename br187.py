@@ -155,7 +155,7 @@ OFR Consultants
     parser.add_argument('--separation', help="the separation distance between the radiator and the receiving surface in meters. (If you are using boundary distances then this will be twice the boundary distance).",type=float, default="0")
     parser.add_argument('--type', help="the type of analysis to perform. 'o' orthogonal, 'c' corner, 'p' parallel. By default this is set as 'p'", choices=['c','o','p'], type=str, default='p')
     parser.add_argument('--title', help="a title for the analysis", type=str, default="unnamed analysis")
-    parser.add_argument('-o', '--output', help="Name of output file if output", type=str, default=None)
+    parser.add_argument('-o', '--output', help="output file path for saving results", type=str, default=None)
     # REMEMBER TO UPDATE USAGE IF ADDING ARGUMENTS
     args = parser.parse_args()
     #done parsing args
