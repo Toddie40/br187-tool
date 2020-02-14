@@ -5,6 +5,7 @@ Tool for calculating the external fire spread of a radiating surface in line wit
 `br187.py`
 
 or for command line usage add the `-c` flag and provide the geometry:
+
 `br187.py -c [--width WIDTH] [--height HEIGHT] [--separation SEPARATION] [--type TYPE] [--title "TITLE"] [--output OUTPUTPATH]`
 
 (Types are: **p**arallel, **c**orner, **o**rthogonal)
