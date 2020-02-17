@@ -1,24 +1,27 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import *
+import configparser
+
+global configpath
+configpath = './/br187.conf'
 
 class Gui:
 
-    def __init__(self, root):
-
+    def __init__(self, root, config):
 
         #colors
-        bg = "#ddd"
-        fg = "#444"
-        ofr = "#009999"
-        white = "#eee"
+        bg = config['colors']['bg']
+        fg = config['colors']['fg']
+        ofr = config['colors']['ofr']
+        white = config['colors']['white']
 
         #font
-        fnt_title = 'Helvetica 18 bold'
-        fnt_h1 = 'Helvetica 16 bold underline'
-        fnt_h2 = 'Helvetica 14 bold'
-        fnt_alt = 'Helvetica 12'
-        fnt = 'Helvetica 10'
+        fnt_title = config['fonts']['title']
+        fnt_h1 = config['fonts']['heading1']
+        fnt_h2 = config['fonts']['heading2']
+        fnt_alt = config['fonts']['alt']
+        fnt = config['fonts']['normal']
 
 
         style = Style()
@@ -81,7 +84,10 @@ class Gui:
         |_______________|_______________|
         '''
 
-        #input side
+        #input side NEEDS REFACTORING self.containers is a terrible idea and name
+
+        self.date_label = Label(self.input_container, padding=10)
+        self.date_label.pack(side=TOP, fill=BOTH, expand=YES)
 
         self.containers = [0] * 4
 
@@ -234,7 +240,7 @@ class Gui:
             # do nothing, the app is closed
 
 
-def init(title, icon):
+def init(title, icon, config):
     root = Tk()
     root.wm_title(title)
     try:
@@ -242,5 +248,5 @@ def init(title, icon):
     except:
         print("Unable to locate program icon")
     root.resizable(False, False) #non-resizable window for now
-    gui = Gui(root)
+    gui = Gui(root, config)
     return gui

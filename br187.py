@@ -1,13 +1,18 @@
 import sys, os
 import numpy as np
 from lib import gui
+from datetime import date
+import configparser
 
 
 global app_title
 global app_icon
+global config_path
 
 app_title = "BR187 Calculator"
 app_icon = ".//icon.ico"
+config_path = './/br187.conf'
+
 
 class Radiator:
     def __init__(self, width, height):
@@ -72,6 +77,7 @@ class Analysis:
     def calculate(self):
         results = {
                     'Title' : self.title,
+                    'Date' : today,
                     'Type': self.typeDict[self.type],
                     'Separation': self.separation,
                     'View Factor': self.viewFactor,
@@ -117,7 +123,7 @@ class Analysis:
 
         return True
 
-    # a little recursive script for printing nested dictionaries in a nice way
+    # a little recursive script for printing nested dictionaries in a nice way #It occurs to me now that this problem is solved for me in the json module
     def pretty_print_dict(self,d,indent=0):
         for key, value in d.items():
             if isinstance(value, dict):
@@ -163,6 +169,14 @@ OFR Consultants
     type = args.type
     title = args.title
 
+    #parse config
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(config_path)
+
+    #set date using format specified in the config file
+    global today
+    today = date.today().strftime(config['misc']['dateformat'])
+
     def do_analysis():
         title = UI.entries['title'].get()
         type = UI.entries['type'].get()
@@ -178,7 +192,8 @@ OFR Consultants
 
     if not args.commandline:
 
-        UI = gui.init(app_title, app_icon)
+        UI = gui.init(app_title, app_icon, config)
+        UI.date_label['text'] = today
         UI.entries['width'].insert(0,args.width)
         UI.entries['height'].insert(0,args.height)
         UI.entries['separation'].insert(0,args.separation)
