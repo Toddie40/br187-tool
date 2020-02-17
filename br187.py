@@ -170,7 +170,7 @@ OFR Consultants
     title = args.title
 
     #parse config
-    config = configparser.ConfigParser(interpolation=None)
+    config = configparser.ConfigParser(interpolation=None)  # interpolation is set to None to stop the parser thinking that '%' in the date format are meant for interpolation.
     config.read(config_path)
 
     #set date using format specified in the config file
